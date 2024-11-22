@@ -268,17 +268,54 @@ medusaIntegrationTestRunner({
           object: "sales-channel",
         })
 
-        await api
+        const err = await api
           .get(
             `/admin/sales-channels/${salesChannel1.id}?fields=id,deleted_at`,
             adminHeaders
           )
           .catch((err) => {
-            expect(err.response.data.type).toEqual("not_found")
-            expect(err.response.data.message).toEqual(
-              `Sales channel with id: ${salesChannel1.id} not found`
-            )
+            return err
           })
+
+        expect(err.response.data.type).toEqual("not_found")
+        expect(err.response.data.message).toEqual(
+          `Sales channel with id: ${salesChannel1.id} not found`
+        )
+      })
+
+      it("should fail to delete the requested sales channel if it is used as a default sales channel", async () => {
+        const toDelete = (
+          await api.get(
+            `/admin/sales-channels/${salesChannel1.id}`,
+            adminHeaders
+          )
+        ).data.sales_channel
+
+        expect(toDelete.id).toEqual(salesChannel1.id)
+        expect(toDelete.deleted_at).toEqual(null)
+
+        const defaultStoreId = (await api.get("/admin/stores", adminHeaders))
+          .data.stores?.[0]?.id
+
+        const storeResponse = (
+          await api.post(
+            `/admin/stores/${defaultStoreId}`,
+            {
+              default_sales_channel_id: salesChannel1.id,
+            },
+            adminHeaders
+          )
+        ).data.store
+
+        expect(storeResponse.default_sales_channel_id).toEqual(salesChannel1.id)
+
+        const errorResponse = await api
+          .delete(`/admin/sales-channels/${salesChannel1.id}`, adminHeaders)
+          .catch((err) => err)
+
+        expect(errorResponse.response.data.message).toEqual(
+          `Cannot delete default sales channels: ${salesChannel1.id}`
+        )
       })
 
       it("should successfully delete channel associations", async () => {

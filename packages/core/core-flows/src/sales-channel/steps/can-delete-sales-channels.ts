@@ -1,38 +1,36 @@
 import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
 
-import {
-  ContainerRegistrationKeys,
-  Module,
-  Modules,
-} from "@medusajs/framework/utils"
-export const canDeleteSalesChannelsStepId = "can-delete-sales-channels-step"
+import { MedusaError, Modules } from "@medusajs/framework/utils"
+export const canDeleteSalesChannelsOrThrowStepId =
+  "can-delete-sales-channels-or-throw-step"
 
-export const canDeleteSalesChannelsStep = createStep(
-  canDeleteSalesChannelsStepId,
+export const canDeleteSalesChannelsOrThrowStep = createStep(
+  canDeleteSalesChannelsOrThrowStepId,
   async ({ ids }: { ids: string | string[] }, { container }) => {
     const salesChannelIdsToDelete = Array.isArray(ids) ? ids : [ids]
 
-    const salesChannelsModule = await container.resolve(Modules.SALES_CHANNEL)
     const storeModule = await container.resolve(Modules.STORE)
 
     const stores = await storeModule.listStores(
-      {},
+      {
+        default_sales_channel_id: salesChannelIdsToDelete,
+      },
       {
         select: ["default_sales_channel_id"],
       }
     )
 
-    const defaultSalesChannelIds = new Set(
-      stores.map((s) => s.default_sales_channel_id)
-    )
+    const defaultSalesChannelIds = stores.map((s) => s.default_sales_channel_id)
 
-    const salesChannels = await salesChannelsModule.listSalesChannels(
-      { id: salesChannelIdsToDelete },
-      {
-        select: ["id"],
-      }
-    )
+    if (defaultSalesChannelIds.length) {
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        `Cannot delete default sales channels: ${defaultSalesChannelIds.join(
+          ", "
+        )}`
+      )
+    }
 
-    // return new StepResponse(salesChannels.length > 0, salesChannels)
+    return new StepResponse(true)
   }
 )

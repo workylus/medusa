@@ -3,6 +3,7 @@ import {
   adminHeaders,
   createAdminUser,
 } from "../../../../helpers/create-admin-user"
+import { Modules } from "@medusajs/framework/utils"
 
 jest.setTimeout(60000)
 
@@ -10,9 +11,10 @@ medusaIntegrationTestRunner({
   testSuite: ({ dbConnection, getContainer, api }) => {
     let salesChannel1
     let salesChannel2
+    let container
 
     beforeEach(async () => {
-      const container = getContainer()
+      container = getContainer()
       await createAdminUser(dbConnection, adminHeaders, container)
 
       salesChannel1 = (
@@ -246,26 +248,23 @@ medusaIntegrationTestRunner({
 
     describe("DELETE /admin/sales-channels/:id", () => {
       it("should fail to delete the requested sales channel if it is used as a default sales channel", async () => {
-        const defaultStoreId = (await api.get("/admin/stores", adminHeaders))
-          .data.stores?.[0]?.id
-
-        const salesChannel = await api.post(
-          "/admin/sales-channels",
-          { name: "Test channel", description: "Test" },
-          adminHeaders
-        ).data.sales_channel
-
-        const storeResponse = (
+        const salesChannel = (
           await api.post(
-            `/admin/stores/${defaultStoreId}`,
-            {
-              default_sales_channel_id: salesChannel.id,
-            },
+            "/admin/sales-channels",
+            { name: "Test channel", description: "Test" },
             adminHeaders
           )
-        ).data.store
+        ).data.sales_channel
 
-        expect(storeResponse.default_sales_channel_id).toEqual(salesChannel.id)
+        const storeModule = container.resolve(Modules.STORE)
+        await storeModule.createStores({
+          name: "New store",
+          supported_currencies: [
+            { currency_code: "usd", is_default: true },
+            { currency_code: "dkk" },
+          ],
+          default_sales_channel_id: salesChannel.id,
+        })
 
         const errorResponse = await api
           .delete(`/admin/sales-channels/${salesChannel.id}`, adminHeaders)

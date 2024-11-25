@@ -1,5 +1,15 @@
 # @medusajs/product
 
+## 2.0.5
+
+### Patch Changes
+
+- [#10187](https://github.com/medusajs/medusa/pull/10187) [`1659c9be5d3ace1bed9f3a6e7206fe54e60645c0`](https://github.com/medusajs/medusa/commit/1659c9be5d3ace1bed9f3a6e7206fe54e60645c0) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - feat(dashboard): Allow re-ordering product images
+
+- [#10144](https://github.com/medusajs/medusa/pull/10144) [`1f44281ed6bc2de0ba8ffec43f0671902b711520`](https://github.com/medusajs/medusa/commit/1f44281ed6bc2de0ba8ffec43f0671902b711520) Thanks [@adrien2p](https://github.com/adrien2p)! - fix(product): Update full descendant true when update parent category id
+
+- [#10119](https://github.com/medusajs/medusa/pull/10119) [`2822972e04f12d2ca9378dd09529ab6ca308a286`](https://github.com/medusajs/medusa/commit/2822972e04f12d2ca9378dd09529ab6ca308a286) Thanks [@adrien2p](https://github.com/adrien2p)! - Fix/mikro orm cli wrapper
+
 ## 2.0.4
 
 ## 2.0.3

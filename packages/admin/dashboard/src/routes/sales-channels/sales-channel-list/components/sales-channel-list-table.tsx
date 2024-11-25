@@ -145,6 +145,10 @@ const SalesChannelActions = ({
     })
   }
 
+  const disabledTooltip = salesChannel.is_default
+    ? t("salesChannels.tooltip.cannotDeleteDefault")
+    : undefined
+
   const groups: ActionGroup[] = [
     {
       actions: [
@@ -158,6 +162,7 @@ const SalesChannelActions = ({
           label: t("actions.delete"),
           onClick: handleDelete,
           disabled: salesChannel.is_default,
+          disabledTooltip,
         },
       ],
     },

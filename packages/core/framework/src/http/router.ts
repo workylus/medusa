@@ -183,6 +183,20 @@ function getBodyParserMiddleware(args?: ParserConfigArgs) {
   ]
 }
 
+function createCorsOptions(origin: string): cors.CorsOptions {
+  return {
+    origin: parseCorsOrigins(origin),
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-publishable-key'],
+  }
+}
+
+function applyCors(router: Router, route: string, corsConfig: cors.CorsOptions) {
+  router.options(route, cors(corsConfig))
+  router.use(route, cors(corsConfig))
+}
+
 // TODO this router would need a proper rework, but it is out of scope right now
 
 export class ApiRoutesLoader {
@@ -647,47 +661,26 @@ export class ApiRoutesLoader {
        */
 
       if (config.shouldAppendAdminCors) {
-        /**
-         * Apply the admin cors
-         */
-        this.#router.use(
-          descriptor.route,
-          cors({
-            origin: parseCorsOrigins(
-              configManager.config.projectConfig.http.adminCors
-            ),
-            credentials: true,
-          })
+        applyCors(
+          this.#router, 
+          descriptor.route, 
+          createCorsOptions(configManager.config.projectConfig.http.adminCors)
         )
       }
 
       if (config.shouldAppendAuthCors) {
-        /**
-         * Apply the auth cors
-         */
-        this.#router.use(
-          descriptor.route,
-          cors({
-            origin: parseCorsOrigins(
-              configManager.config.projectConfig.http.authCors
-            ),
-            credentials: true,
-          })
+        applyCors(
+          this.#router, 
+          descriptor.route, 
+          createCorsOptions(configManager.config.projectConfig.http.authCors)
         )
       }
 
       if (config.shouldAppendStoreCors) {
-        /**
-         * Apply the store cors
-         */
-        this.#router.use(
-          descriptor.route,
-          cors({
-            origin: parseCorsOrigins(
-              configManager.config.projectConfig.http.storeCors
-            ),
-            credentials: true,
-          })
+        applyCors(
+          this.#router, 
+          descriptor.route, 
+          createCorsOptions(configManager.config.projectConfig.http.storeCors)
         )
       }
 

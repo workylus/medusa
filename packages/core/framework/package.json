@@ -59,6 +59,7 @@
     "@mikro-orm/postgresql": "5.9.7",
     "@swc/core": "^1.7.28",
     "@swc/jest": "^0.2.36",
+    "@types/cors": "^2.8.17",
     "@types/jsonwebtoken": "^8.5.9",
     "awilix": "^8.0.1",
     "ioredis": "^5.4.1",

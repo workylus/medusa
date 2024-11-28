@@ -2,4 +2,4 @@
 "@medusajs/framework": patch
 ---
 
-fix(framework): improve CORS handling for non-simple HTTP requests
+fix(framework): Apply CORS and auth middleware for global middleware that is not already applied by routes

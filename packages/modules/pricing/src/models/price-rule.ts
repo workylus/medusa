@@ -1,4 +1,4 @@
-import { model } from "@medusajs/framework/utils"
+import { model, PricingRuleOperator } from "@medusajs/framework/utils"
 import Price from "./price"
 
 // const tableName = "price_rule"
@@ -20,6 +20,7 @@ const PriceRule = model
     id: model.id({ prefix: "prule" }).primaryKey(),
     attribute: model.text(),
     value: model.text(),
+    operator: model.enum(PricingRuleOperator).default(PricingRuleOperator.EQ),
     priority: model.number().default(0),
     price: model.belongsTo(() => Price, {
       mappedBy: "price_rules",
@@ -27,7 +28,7 @@ const PriceRule = model
   })
   .indexes([
     {
-      on: ["price_id", "attribute"],
+      on: ["price_id", "attribute", "operator"],
       where: "deleted_at IS NULL",
       unique: true,
     },

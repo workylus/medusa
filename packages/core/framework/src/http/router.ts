@@ -192,10 +192,33 @@ function createCorsOptions(origin: string): cors.CorsOptions {
 
 function applyCors(
   router: Router,
-  route: string,
+  route: string | RegExp,
   corsConfig: cors.CorsOptions
 ) {
   router.use(route, cors(corsConfig))
+}
+
+function getRouteContext(
+  path: string | RegExp
+): "admin" | "store" | "auth" | null {
+  /**
+   * We cannot reliably guess the route context from a regex, so we skip it.
+   */
+  if (path instanceof RegExp) {
+    return null
+  }
+
+  if (path.startsWith("/admin")) {
+    return "admin"
+  }
+  if (path.startsWith("/store")) {
+    return "store"
+  }
+  if (path.startsWith("/auth")) {
+    return "auth"
+  }
+
+  return null
 }
 
 // TODO this router would need a proper rework, but it is out of scope right now
@@ -604,13 +627,15 @@ export class ApiRoutesLoader {
   /**
    * Applies middleware that checks if a valid publishable key is set on store request
    */
-  applyStorePublishableKeyMiddleware(route: string) {
+  applyStorePublishableKeyMiddleware(route: string | RegExp) {
     let middleware = ensurePublishableApiKeyMiddleware as unknown as
       | RequestHandler
       | MiddlewareFunction
 
     if (ApiRoutesLoader.traceMiddleware) {
-      middleware = ApiRoutesLoader.traceMiddleware(middleware, { route: route })
+      middleware = ApiRoutesLoader.traceMiddleware(middleware, {
+        route: String(route),
+      })
     }
 
     this.#router.use(route, middleware as RequestHandler)
@@ -621,7 +646,7 @@ export class ApiRoutesLoader {
    * needed to pass the middleware via the trace calls
    */
   applyAuthMiddleware(
-    route: string,
+    route: string | RegExp,
     actorType: string | string[],
     authType: AuthType | AuthType[],
     options?: { allowUnauthenticated?: boolean; allowUnregistered?: boolean }
@@ -632,7 +657,7 @@ export class ApiRoutesLoader {
     if (ApiRoutesLoader.traceMiddleware) {
       authenticateMiddleware = ApiRoutesLoader.traceMiddleware(
         authenticateMiddleware,
-        { route: route }
+        { route: String(route) }
       )
     }
 
@@ -648,14 +673,12 @@ export class ApiRoutesLoader {
   applyRouteSpecificMiddlewares(): void {
     const prioritizedRoutes = prioritize([...this.#routesMap.values()])
     const handledPaths = new Set<string>()
-    const middlewarePaths = new Set<string>()
+    const middlewarePaths = new Set<string | RegExp>()
 
     const globalRoutes = this.#globalMiddlewaresDescriptor?.config?.routes ?? []
 
     for (const route of globalRoutes) {
-      if (typeof route.matcher === "string") {
-        middlewarePaths.add(route.matcher)
-      }
+      middlewarePaths.add(route.matcher)
     }
 
     for (const descriptor of prioritizedRoutes) {
@@ -724,12 +747,22 @@ export class ApiRoutesLoader {
       }
     }
 
+    /**
+     * Apply CORS and auth middleware for paths defined in global middleware but not already handled by routes.
+     */
     for (const path of middlewarePaths) {
-      /**
-       * Apply CORS and auth middleware for paths defined in global middleware but not already handled by routes.
-       */
-      if (!handledPaths.has(path)) {
-        if (path.startsWith("/admin")) {
+      if (typeof path === "string" && handledPaths.has(path)) {
+        continue
+      }
+
+      const context = getRouteContext(path)
+
+      if (!context) {
+        continue
+      }
+
+      switch (context) {
+        case "admin":
           applyCors(
             this.#router,
             path,
@@ -740,16 +773,22 @@ export class ApiRoutesLoader {
             "session",
             "api-key",
           ])
-        }
-
-        if (path.startsWith("/store")) {
+          break
+        case "store":
           applyCors(
             this.#router,
             path,
             createCorsOptions(configManager.config.projectConfig.http.storeCors)
           )
           this.applyStorePublishableKeyMiddleware(path)
-        }
+          break
+        case "auth":
+          applyCors(
+            this.#router,
+            path,
+            createCorsOptions(configManager.config.projectConfig.http.authCors)
+          )
+          break
       }
     }
   }

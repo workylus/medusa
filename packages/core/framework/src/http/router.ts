@@ -187,14 +187,11 @@ function createCorsOptions(origin: string): cors.CorsOptions {
   return {
     origin: parseCorsOrigins(origin),
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-publishable-key'],
   }
 }
 
 function applyCors(router: Router, route: string, corsConfig: cors.CorsOptions) {
-  router.options(route, cors(corsConfig))
-  router.use(route, cors(corsConfig))
+  router.use(route, cors(corsConfig));
 }
 
 // TODO this router would need a proper rework, but it is out of scope right now
@@ -402,6 +399,10 @@ export class ApiRoutesLoader {
             if (shouldAddCors) {
               config.shouldAppendAdminCors = true
             }
+
+            if (route === "/admin/products") {
+              console.log("shouldAppendAdminCors", config.shouldAppendAdminCors, config.routes?.map((r) => r.method))
+            }
           }
 
           if (route.startsWith("/store")) {
@@ -564,6 +565,7 @@ export class ApiRoutesLoader {
 
         return fileEntries.map(async (entry: Dirent) => {
           const path = join(entry.path, entry.name)
+          console.log("creating routes descriptor for", path)
           return this.createRoutesDescriptor(path)
         })
       })
@@ -646,6 +648,16 @@ export class ApiRoutesLoader {
    */
   applyRouteSpecificMiddlewares(): void {
     const prioritizedRoutes = prioritize([...this.#routesMap.values()])
+    const handledPaths = new Set<string>()
+    const middlewarePaths = new Set<string>()
+
+    const globalRoutes = this.#globalMiddlewaresDescriptor?.config?.routes ?? []
+
+    for (const route of globalRoutes) {
+      if (typeof route.matcher === "string") {
+        middlewarePaths.add(route.matcher)
+      }
+    }
 
     for (const descriptor of prioritizedRoutes) {
       if (!descriptor.config?.routes?.length) {
@@ -653,12 +665,7 @@ export class ApiRoutesLoader {
       }
 
       const config = descriptor.config
-      const routes = descriptor.config.routes
-
-      /**
-       * Apply default store and admin middlewares if
-       * not opted out of.
-       */
+      handledPaths.add(descriptor.route)
 
       if (config.shouldAppendAdminCors) {
         applyCors(
@@ -684,6 +691,7 @@ export class ApiRoutesLoader {
         )
       }
 
+      // Apply other middlewares
       if (config.routeType === "store") {
         this.applyStorePublishableKeyMiddleware(descriptor.route)
       }
@@ -708,12 +716,29 @@ export class ApiRoutesLoader {
         ])
       }
 
-      for (const route of routes) {
+      for (const route of descriptor.config.routes) {
         /**
          * Apply the body parser middleware if the route
          * has not opted out of it.
          */
         this.applyBodyParserMiddleware(descriptor.route, route.method!)
+      }
+    }
+
+    for (const path of middlewarePaths) {
+      /**
+       * Apply CORS and auth middleware for paths defined in global middleware but not already handled by routes.
+       */
+      if (!handledPaths.has(path)) {
+        if (path.startsWith("/admin")) {
+          applyCors(this.#router, path, createCorsOptions(configManager.config.projectConfig.http.adminCors))
+          this.applyAuthMiddleware(path, "user", ["bearer", "session", "api-key"])
+        }
+
+        if (path.startsWith("/store")) {
+          applyCors(this.#router, path, createCorsOptions(configManager.config.projectConfig.http.storeCors))
+          this.applyStorePublishableKeyMiddleware(path)
+        }
       }
     }
   }

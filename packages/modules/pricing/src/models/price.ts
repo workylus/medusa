@@ -158,4 +158,5 @@ const Price = model
 // }
 // }
 
+Price.name = "Price" as any
 export default Price

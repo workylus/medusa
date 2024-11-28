@@ -87,7 +87,7 @@ moduleIntegrationTestRunner<IPricingModuleService>({
           ])
         })
 
-        it.only("should return requested fields", async () => {
+        it("should return requested fields", async () => {
           const [priceListRuleResult, count] =
             await service.listAndCountPriceListRules(
               {},

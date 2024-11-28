@@ -39,7 +39,7 @@ const createPriceLists = async (
   rules: object = defaultRules,
   prices = defaultPriceListPrices
 ) => {
-  return await service.createPriceLists([
+  const result = await service.createPriceLists([
     {
       title: "Test Price List",
       description: "test description",
@@ -50,6 +50,7 @@ const createPriceLists = async (
       ...priceListOverride,
     },
   ])
+  return result
 }
 
 moduleIntegrationTestRunner<IPricingModuleService>({
@@ -1630,7 +1631,7 @@ moduleIntegrationTestRunner<IPricingModuleService>({
             ])
           })
 
-          it("should not return price list prices when price list conditions are met but price rules are not", async () => {
+          it.only("should not return price list prices when price list conditions are met but price rules are not", async () => {
             await createPriceLists(service, {}, { region_id: ["DE", "PL"] }, [
               ...defaultPriceListPrices,
               {

@@ -1330,6 +1330,7 @@ export default class PricingModuleService
         sharedContext
       )
 
+    console.log(performedActions.created, Price.name, PriceRule.name)
     eventBuilders.createdPrice({
       data: performedActions.created[Price.name] ?? [],
       sharedContext,

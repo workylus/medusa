@@ -18,7 +18,7 @@ import PriceListRule from "./price-list-rule"
 //   where: "deleted_at IS NOT NULL",
 // })
 
-export const PriceListIdPrefix = "plist"
+// export const PriceListIdPrefix = "plist"
 
 const PriceList = model
   .define("PriceList", {

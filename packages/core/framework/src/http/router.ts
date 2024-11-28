@@ -190,8 +190,12 @@ function createCorsOptions(origin: string): cors.CorsOptions {
   }
 }
 
-function applyCors(router: Router, route: string, corsConfig: cors.CorsOptions) {
-  router.use(route, cors(corsConfig));
+function applyCors(
+  router: Router,
+  route: string,
+  corsConfig: cors.CorsOptions
+) {
+  router.use(route, cors(corsConfig))
 }
 
 // TODO this router would need a proper rework, but it is out of scope right now
@@ -399,10 +403,6 @@ export class ApiRoutesLoader {
             if (shouldAddCors) {
               config.shouldAppendAdminCors = true
             }
-
-            if (route === "/admin/products") {
-              console.log("shouldAppendAdminCors", config.shouldAppendAdminCors, config.routes?.map((r) => r.method))
-            }
           }
 
           if (route.startsWith("/store")) {
@@ -565,7 +565,6 @@ export class ApiRoutesLoader {
 
         return fileEntries.map(async (entry: Dirent) => {
           const path = join(entry.path, entry.name)
-          console.log("creating routes descriptor for", path)
           return this.createRoutesDescriptor(path)
         })
       })
@@ -669,24 +668,24 @@ export class ApiRoutesLoader {
 
       if (config.shouldAppendAdminCors) {
         applyCors(
-          this.#router, 
-          descriptor.route, 
+          this.#router,
+          descriptor.route,
           createCorsOptions(configManager.config.projectConfig.http.adminCors)
         )
       }
 
       if (config.shouldAppendAuthCors) {
         applyCors(
-          this.#router, 
-          descriptor.route, 
+          this.#router,
+          descriptor.route,
           createCorsOptions(configManager.config.projectConfig.http.authCors)
         )
       }
 
       if (config.shouldAppendStoreCors) {
         applyCors(
-          this.#router, 
-          descriptor.route, 
+          this.#router,
+          descriptor.route,
           createCorsOptions(configManager.config.projectConfig.http.storeCors)
         )
       }
@@ -731,12 +730,24 @@ export class ApiRoutesLoader {
        */
       if (!handledPaths.has(path)) {
         if (path.startsWith("/admin")) {
-          applyCors(this.#router, path, createCorsOptions(configManager.config.projectConfig.http.adminCors))
-          this.applyAuthMiddleware(path, "user", ["bearer", "session", "api-key"])
+          applyCors(
+            this.#router,
+            path,
+            createCorsOptions(configManager.config.projectConfig.http.adminCors)
+          )
+          this.applyAuthMiddleware(path, "user", [
+            "bearer",
+            "session",
+            "api-key",
+          ])
         }
 
         if (path.startsWith("/store")) {
-          applyCors(this.#router, path, createCorsOptions(configManager.config.projectConfig.http.storeCors))
+          applyCors(
+            this.#router,
+            path,
+            createCorsOptions(configManager.config.projectConfig.http.storeCors)
+          )
           this.applyStorePublishableKeyMiddleware(path)
         }
       }

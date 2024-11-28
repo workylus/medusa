@@ -5919,7 +5919,7 @@ export const generatedSidebar = [
                     "type": "category",
                     "title": "Data Models",
                     "hasTitleStyling": true,
-                    "autogenerate_path": "/references/product_models/classes",
+                    "autogenerate_path": "/references/product_models/variables",
                     "children": [
                       {
                         "loaded": true,
@@ -8035,6 +8035,14 @@ export const generatedSidebar = [
             "type": "link",
             "path": "/integrations/guides/sanity",
             "title": "Sanity",
+            "children": []
+          },
+          {
+            "loaded": true,
+            "isPathHref": true,
+            "type": "link",
+            "path": "/integrations/guides/resend",
+            "title": "Resend",
             "children": []
           }
         ]

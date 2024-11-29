@@ -6,6 +6,7 @@ import { toMikroORMEntity } from "@medusajs/framework/utils"
 import { defaultPriceRuleData } from "./data"
 
 export * from "./data"
+export * from "./operators"
 
 export async function createPriceRules(
   manager: SqlEntityManager,

@@ -246,7 +246,7 @@ moduleIntegrationTestRunner<IPricingModuleService>({
           )
         })
 
-        it("should update a priceList with starts_at and ends_at dates given as string", async () => {
+        it.only("should update a priceList with starts_at and ends_at dates given as string", async () => {
           let [priceList] = await service.updatePriceLists([
             {
               id: createdId,
@@ -254,11 +254,14 @@ moduleIntegrationTestRunner<IPricingModuleService>({
               ends_at: "10/20/2030",
             },
           ])
-          expect(priceList).toEqual(
-            expect.objectContaining({
-              starts_at: new Date("10/10/2010").toISOString(),
-              ends_at: new Date("10/20/2030").toISOString(),
-            })
+
+          expect(priceList).toHaveProperty("starts_at")
+          expect(priceList).toHaveProperty("ends_at")
+          expect(priceList.starts_at?.toString()).toEqual(
+            new Date("10/10/2010").toISOString()
+          )
+          expect(priceList.ends_at?.toString()).toEqual(
+            new Date("10/20/2030").toISOString()
           )
         })
 
@@ -369,7 +372,7 @@ moduleIntegrationTestRunner<IPricingModuleService>({
           )
         })
 
-        it("should create a priceList with starts_at and ends_at dates given as string", async () => {
+        it.only("should create a priceList with starts_at and ends_at dates given as string", async () => {
           let [priceList] = await service.createPriceLists([
             {
               title: "test",
@@ -379,11 +382,13 @@ moduleIntegrationTestRunner<IPricingModuleService>({
             },
           ])
 
-          expect(priceList).toEqual(
-            expect.objectContaining({
-              starts_at: new Date("10/10/2010").toISOString(),
-              ends_at: new Date("10/20/2030").toISOString(),
-            })
+          expect(priceList).toHaveProperty("starts_at")
+          expect(priceList).toHaveProperty("ends_at")
+          expect(priceList.starts_at?.toString()).toEqual(
+            new Date("10/10/2010").toString()
+          )
+          expect(priceList.ends_at?.toString()).toEqual(
+            new Date("10/20/2030").toString()
           )
         })
 

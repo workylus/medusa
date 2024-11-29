@@ -1632,7 +1632,7 @@ moduleIntegrationTestRunner<IPricingModuleService>({
             ])
           })
 
-          it.only("should not return price list prices when price list conditions are met but price rules are not", async () => {
+          it("should not return price list prices when price list conditions are met but price rules are not", async () => {
             await createPriceLists(service, {}, { region_id: ["DE", "PL"] }, [
               ...defaultPriceListPrices,
               {
@@ -1863,7 +1863,7 @@ moduleIntegrationTestRunner<IPricingModuleService>({
       describe("calculatePrices", () => {
         let priceSet1
 
-        it("should return accurate prices when using custom price rule operators", async () => {
+        it.only("should return accurate prices when using custom price rule operators", async () => {
           priceSet1 = await service.createPriceSets({
             prices: [
               {

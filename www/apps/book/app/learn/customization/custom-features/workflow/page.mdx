@@ -35,6 +35,8 @@ A workflow consists of a series of steps, each step created in a TypeScript or J
 
 The workflow you're creating in this guide has one step to create the brand. So, create the file `src/workflows/create-brand/steps/create-brand.ts` with the following content:
 
+![Directory structure in the Medusa project after adding the file for createBrandStep](https://res.cloudinary.com/dza7lstvk/image/upload/v1732869184/Medusa%20Book/brand-workflow-dir-overview-1_fjvf5j.jpg)
+
 ```ts title="src/workflows/create-brand/steps/create-brand.ts"
 import {
   createStep,
@@ -121,6 +123,8 @@ So, if an error occurs during the workflow's execution, the brand that was creat
 You can now create the workflow that runs the `createBrandStep`. A workflow is created in a TypeScript or JavaScript file under the `src/workflows` directory. In the file, you use the `createWorkflow` function imported from `@medusajs/framework/workflows-sdk` to create the workflow.
 
 So, create the file `src/workflows/create-brand/index.ts` with the following content:
+
+![Directory structure in the Medusa project after adding the file for createBrandWorkflow](https://res.cloudinary.com/dza7lstvk/image/upload/v1732869424/Medusa%20Book/brand-workflow-dir-overview-2_cbotxb.jpg)
 
 ```ts
 import {

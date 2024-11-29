@@ -40,7 +40,7 @@ const createPriceLists = async (
   rules: object = defaultRules,
   prices = defaultPriceListPrices
 ) => {
-  const result = await service.createPriceLists([
+  return service.createPriceLists([
     {
       title: "Test Price List",
       description: "test description",
@@ -51,7 +51,6 @@ const createPriceLists = async (
       ...priceListOverride,
     },
   ])
-  return result
 }
 
 moduleIntegrationTestRunner<IPricingModuleService>({
@@ -1863,7 +1862,7 @@ moduleIntegrationTestRunner<IPricingModuleService>({
       describe("calculatePrices", () => {
         let priceSet1
 
-        it.only("should return accurate prices when using custom price rule operators", async () => {
+        it("should return accurate prices when using custom price rule operators", async () => {
           priceSet1 = await service.createPriceSets({
             prices: [
               {

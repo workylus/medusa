@@ -246,7 +246,7 @@ moduleIntegrationTestRunner<IPricingModuleService>({
           )
         })
 
-        it.only("should update a priceList with starts_at and ends_at dates given as string", async () => {
+        it("should update a priceList with starts_at and ends_at dates given as string", async () => {
           let [priceList] = await service.updatePriceLists([
             {
               id: createdId,
@@ -372,7 +372,7 @@ moduleIntegrationTestRunner<IPricingModuleService>({
           )
         })
 
-        it.only("should create a priceList with starts_at and ends_at dates given as string", async () => {
+        it("should create a priceList with starts_at and ends_at dates given as string", async () => {
           let [priceList] = await service.createPriceLists([
             {
               title: "test",

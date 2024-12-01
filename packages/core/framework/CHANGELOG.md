@@ -1,5 +1,19 @@
 # @medusajs/framework
 
+## 2.0.8
+
+### Patch Changes
+
+- [#10374](https://github.com/medusajs/medusa/pull/10374) [`11bd55613304350a5478fd4c001e2309cca3a995`](https://github.com/medusajs/medusa/commit/11bd55613304350a5478fd4c001e2309cca3a995) Thanks [@riqwan](https://github.com/riqwan)! - feat(core-flows,framework,medusa): list shipping options pass in cart as pricing context
+
+- Updated dependencies [[`194361b95a0ed2c182e0a3c107fde9b4b6a7bcf7`](https://github.com/medusajs/medusa/commit/194361b95a0ed2c182e0a3c107fde9b4b6a7bcf7), [`324b4ab438662f44de495ffe4d9137677a032a00`](https://github.com/medusajs/medusa/commit/324b4ab438662f44de495ffe4d9137677a032a00)]:
+  - @medusajs/utils@2.0.8
+  - @medusajs/types@2.0.8
+  - @medusajs/modules-sdk@2.0.8
+  - @medusajs/orchestration@2.0.8
+  - @medusajs/workflows-sdk@2.0.8
+  - @medusajs/telemetry@2.0.8
+
 ## 2.0.7
 
 ### Patch Changes

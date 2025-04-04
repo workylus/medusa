@@ -45,7 +45,7 @@ export const prepareConfirmInventoryInput = (data: {
   const stockLocationIds = new Set<string>()
   const allVariants = new Map<string, any>()
   const mapLocationAvailability = new Map<string, Map<string, BigNumberInput>>()
-  let hasSalesChannelStockLocation = false
+  const variantsWithLocationForChannel = new Set<string>()
   let hasManagedInventory = false
 
   const salesChannelId = data.input.sales_channel_id
@@ -75,11 +75,8 @@ export const prepareConfirmInventoryInput = (data: {
         return
       }
 
-      if (
-        !hasSalesChannelStockLocation &&
-        sales_channels?.id === salesChannelId
-      ) {
-        hasSalesChannelStockLocation = true
+      if (salesChannelId && sales_channels?.id === salesChannelId) {
+        variantsWithLocationForChannel.add(variants.id)
       }
 
       if (location_levels && inventory_items) {
@@ -140,11 +137,18 @@ export const prepareConfirmInventoryInput = (data: {
     return { items: [] }
   }
 
-  if (salesChannelId && !hasSalesChannelStockLocation) {
-    throw new MedusaError(
-      MedusaError.Types.INVALID_DATA,
-      `Sales channel ${salesChannelId} is not associated with any stock location.`
-    )
+  if (salesChannelId) {
+    for (const variant of allVariants.values()) {
+      if (
+        !variantsWithLocationForChannel.has(variant.id) &&
+        !variant.allow_backorder
+      ) {
+        throw new MedusaError(
+          MedusaError.Types.INVALID_DATA,
+          `Sales channel ${salesChannelId} is not associated with any stock location for variant ${variant.id}.`
+        )
+      }
+    }
   }
 
   const items = formatInventoryInput({

@@ -22,7 +22,7 @@ export type AdminGetPromotionParamsType = z.infer<
 export const AdminGetPromotionParams = createSelectParams()
 
 export const AdminGetPromotionsParamsFields = z.object({
-  id: z.string().optional(),
+  id: z.array(z.string()).optional(),
   q: z.string().optional(),
   code: z.union([z.string(), z.array(z.string())]).optional(),
   campaign_id: z.union([z.string(), z.array(z.string())]).optional(),

@@ -11,6 +11,7 @@ export const AdminGetCampaignParams = createSelectParams()
 
 export const AdminGetCampaignsParamsFields = z
   .object({
+    id: z.array(z.string()).optional(),
     q: z.string().optional(),
     campaign_identifier: z.string().optional(),
     budget: z
